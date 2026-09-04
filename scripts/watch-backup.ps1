@@ -1,25 +1,28 @@
 ﻿<#
-    watch-backup.ps1 - Barre de progression pour la sauvegarde en cours.
+    watch-backup.ps1 - Barre de progression pour la sauvegarde (backup.ps1).
 
-    A LANCER DANS TA PROPRE FENETRE PowerShell (pas via Claude), donc zero token :
+    A LANCER DANS TA PROPRE FENETRE PowerShell (pas via Claude) => zero token :
 
         powershell -ExecutionPolicy Bypass -File C:\Users\cyber\github\pc-linux-migration\scripts\watch-backup.ps1
 
-    - N'ecrit rien, ne modifie rien : lecture seule.
-    - Ctrl+C ferme juste l'affichage, ca n'arrete PAS la sauvegarde.
-    - Se termine tout seul quand plus aucun robocopy ne tourne.
+    Lecture seule. Ctrl+C ferme l'affichage sans arreter la sauvegarde.
+    S'arrete tout seul quand plus aucun robocopy ne tourne.
 
-    Optimisation : chaque sous-dossier termine est "gele" et n'est plus reparcouru,
-    pour ne pas gener la sauvegarde en cours.
+    Methode : la progression globale est deduite de l'ESPACE LIBRE qui diminue sur D:
+    (1 seul appel systeme, insensible aux chemins longs / permissions). L'etat par
+    dossier est lu dans les journaux robocopy (D:\BACKUP-PC-2026-09\_logs).
 #>
 
 param(
-    [string]$Path = "D:\BACKUP-PC-2026-09",
-    [int]$IntervalSec = 15
+    [string]$Path        = "D:\BACKUP-PC-2026-09",
+    [double]$StartFreeGB = 291.9,   # espace libre de D: AVANT le lancement de backup.ps1
+    [int]$IntervalSec    = 5
 )
 
-# Tailles attendues par tache (Go), d'apres le releve initial
-$expected = [ordered]@{
+$driveLetter = ($Path.Substring(0,1))
+
+# Ordre des taches = ordre de backup.ps1, avec taille attendue (Go)
+$jobs = [ordered]@{
     "_PRIORITAIRE-Adrien"   = 15.83
     "Downloads"             = 38.98
     "Documents"             = 2.46
@@ -28,96 +31,89 @@ $expected = [ordered]@{
     "iCloudDrive"           = 0.07
     "Vieux-telechargements" = 36.68
 }
-$totalExpected = ($expected.Values | Measure-Object -Sum).Sum
-$frozen = @{}   # nom -> taille Go figee une fois la tache finie
+$totalExpected = ($jobs.Values | Measure-Object -Sum).Sum
+$logDir = Join-Path $Path "_logs"
 
-function Get-DirGB([string]$p) {
-    if (-not (Test-Path -LiteralPath $p)) { return 0.0 }
-    $sum = [int64]0
-    try {
-        foreach ($f in [System.IO.Directory]::EnumerateFiles($p, '*', [System.IO.SearchOption]::AllDirectories)) {
-            try { $sum += ([System.IO.FileInfo]::new($f)).Length } catch {}
-        }
-    } catch {}
-    return [math]::Round($sum / 1GB, 2)
+function Get-FreeGB {
+    try { return [math]::Round((Get-Volume -DriveLetter $driveLetter -ErrorAction Stop).SizeRemaining / 1GB, 2) }
+    catch { return $null }
+}
+
+# Un job est termine si son journal contient la ligne de resume "Octets :" / "Bytes :"
+function Get-JobState([string]$name, [string]$newestLogName) {
+    $lg = Get-ChildItem (Join-Path $logDir "$name`_*.log") -ErrorAction SilentlyContinue |
+          Sort-Object LastWriteTime | Select-Object -Last 1
+    if (-not $lg) { return @{ State = "attente"; Log = $null } }
+    $tail = Get-Content $lg.FullName -Tail 15 -ErrorAction SilentlyContinue
+    if ($tail -match '^\s*(Octets|Bytes)\s*:') { return @{ State = "fini"; Log = $lg } }
+    if ($lg.Name -eq $newestLogName)           { return @{ State = "cours"; Log = $lg } }
+    return @{ State = "attente"; Log = $lg }
 }
 
 Write-Host "Surveillance de $Path" -ForegroundColor Cyan
-Write-Host ("Cible totale estimee : {0:N1} Go   (rafraichissement {1}s)" -f $totalExpected, $IntervalSec) -ForegroundColor Cyan
+Write-Host ("Espace libre initial : {0:N1} Go   |   a copier : {1:N1} Go   |   refresh {2}s" -f $StartFreeGB, $totalExpected, $IntervalSec) -ForegroundColor Cyan
 Write-Host "Ctrl+C = ferme l'affichage seulement.`n" -ForegroundColor DarkGray
 
-$prevTotal = 0.0
-$prevTime  = Get-Date
+# Amorce : evite un debit aberrant au premier affichage
+$f0 = Get-FreeGB
+$prevCopied = if ($f0 -ne $null) { [math]::Max($StartFreeGB - $f0, 0) } else { 0.0 }
+$prevTime   = Get-Date
 $missRobocopy = 0
 
 try {
     while ($true) {
-        $now = Get-Date
-
-        # Tailles actuelles (les dossiers figes ne sont plus reparcourus)
-        $keys = @($expected.Keys)
-        $sizes = @{}
-        for ($i = 0; $i -lt $keys.Count; $i++) {
-            $k = $keys[$i]
-            if ($frozen.ContainsKey($k)) { $sizes[$k] = $frozen[$k] }
-            else { $sizes[$k] = Get-DirGB (Join-Path $Path $k) }
-        }
-        # robocopy traite les taches dans l'ordre : si une tache suivante a demarre,
-        # les precedentes sont terminees -> on les fige.
-        for ($i = 0; $i -lt $keys.Count - 1; $i++) {
-            $laterStarted = $false
-            for ($j = $i + 1; $j -lt $keys.Count; $j++) { if ($sizes[$keys[$j]] -gt 0.05) { $laterStarted = $true; break } }
-            if ($laterStarted -and -not $frozen.ContainsKey($keys[$i])) { $frozen[$keys[$i]] = $sizes[$keys[$i]] }
-        }
-
-        $curTotal = 0.0
-        $lines = @()
-        foreach ($k in $keys) {
-            $e = $expected[$k]; $g = $sizes[$k]
-            $curTotal += $g
-            $p2  = if ($e -gt 0) { [math]::Min([int]($g / $e * 100), 100) } else { 100 }
-            $bar = ("#" * [int]($p2 / 5)).PadRight(20)
-            $mk  = if ($frozen.ContainsKey($k) -or $p2 -ge 100) { "OK" } else { "  " }
-            $lines += ("  {0} [{1}] {2,3}%  {3,6:N1} / {4,-5:N1} Go  {5}" -f $mk, $bar, $p2, $g, $e, $k)
-        }
+        $now  = Get-Date
+        $free = Get-FreeGB
+        $copied = if ($free -ne $null) { [math]::Max($StartFreeGB - $free, 0) } else { $prevCopied }
 
         $elapsed = ($now - $prevTime).TotalSeconds
-        $rateMB  = if ($elapsed -gt 0) { (($curTotal - $prevTotal) * 1024) / $elapsed } else { 0 }
-        $remain  = [math]::Max($totalExpected - $curTotal, 0)
-        $etaTxt  = if ($rateMB -gt 0.5) {
-                       [TimeSpan]::FromSeconds([int](($remain * 1024) / $rateMB)).ToString("hh\:mm\:ss")
-                   } else { "..." }
-        $pct = [math]::Min([math]::Round($curTotal / $totalExpected * 100, 1), 100)
+        $rateMB  = if ($elapsed -gt 0) { (($copied - $prevCopied) * 1024) / $elapsed } else { 0 }
+        $remain  = [math]::Max($totalExpected - $copied, 0)
+        $etaTxt  = if ($rateMB -gt 1) { [TimeSpan]::FromSeconds([int](($remain * 1024) / $rateMB)).ToString("hh\:mm\:ss") } else { "..." }
+        $pct     = [math]::Min([math]::Round($copied / $totalExpected * 100, 1), 100)
 
-        Write-Progress -Activity "Sauvegarde -> $Path" `
-            -Status ("{0:N1} / {1:N1} Go   {2:N0} Mo/s   ETA {3}" -f $curTotal, $totalExpected, $rateMB, $etaTxt) `
+        # journal le plus recent = job en cours
+        $newest = Get-ChildItem (Join-Path $logDir "*.log") -ErrorAction SilentlyContinue |
+                  Sort-Object LastWriteTime | Select-Object -Last 1
+        $newestName = if ($newest) { $newest.Name } else { "" }
+
+        Write-Progress -Activity ("Sauvegarde -> {0}" -f $Path) `
+            -Status ("{0:N1} / {1:N1} Go   {2}%   {3:N0} Mo/s   ETA {4}" -f $copied, $totalExpected, $pct, $rateMB, $etaTxt) `
             -PercentComplete $pct
 
-        Clear-Host
-        Write-Host ("[{0:HH:mm:ss}]  {1:N1} / {2:N1} Go   {3}%   {4:N0} Mo/s   ETA {5}" -f `
-            $now, $curTotal, $totalExpected, $pct, $rateMB, $etaTxt) -ForegroundColor Green
-        Write-Host ""
-        $lines | ForEach-Object { Write-Host $_ }
+        $stamp = "[{0:HH:mm:ss}]" -f $now
+        Write-Host ("{0} {1,5:N1}% | {2,6:N1}/{3:N1} Go | {4,4:N0} Mo/s | ETA {5}" -f `
+            $stamp, $pct, $copied, $totalExpected, $rateMB, $etaTxt) -ForegroundColor Green
 
-        $rc = @(Get-Process robocopy -ErrorAction SilentlyContinue)
-        if ($rc.Count -gt 0) {
-            $missRobocopy = 0
-            Write-Host "`n  robocopy actif ($($rc.Count) processus)" -ForegroundColor DarkGray
-        } else {
-            $missRobocopy++
-            Write-Host "`n  (aucun robocopy actif - $missRobocopy)" -ForegroundColor DarkYellow
+        foreach ($name in $jobs.Keys) {
+            $st = Get-JobState $name $newestName
+            switch ($st.State) {
+                "fini"    { Write-Host ("   [x] {0}" -f $name) -ForegroundColor DarkGray }
+                "cours"   {
+                    $last = if ($st.Log) { (Get-Content $st.Log.FullName -Tail 1 -ErrorAction SilentlyContinue) } else { "" }
+                    $last = ($last -replace '\s+', ' ').Trim()
+                    if ($last.Length -gt 90) { $last = $last.Substring($last.Length - 90) }
+                    Write-Host ("   [>] {0}  (attendu {1:N1} Go)" -f $name, $jobs[$name]) -ForegroundColor Yellow
+                    if ($last) { Write-Host ("        $last") -ForegroundColor DarkYellow }
+                }
+                default   { Write-Host ("   [ ] {0}" -f $name) -ForegroundColor DarkGray }
+            }
         }
+
+        if (@(Get-Process robocopy -ErrorAction SilentlyContinue).Count -gt 0) { $missRobocopy = 0 }
+        else { $missRobocopy++ }
 
         if ($missRobocopy -ge 3) {
             Write-Progress -Activity "Sauvegarde" -Completed
-            Write-Host "`n=== Sauvegarde terminee (plus aucun robocopy) ===" -ForegroundColor Yellow
-            Write-Host ("Total ecrit : {0:N1} Go" -f $curTotal) -ForegroundColor Yellow
-            Write-Host "Etape suivante :  powershell -ExecutionPolicy Bypass -File $PSScriptRoot\backup.ps1 -Verify" -ForegroundColor Yellow
+            Write-Host "`n=== Plus aucun robocopy actif : sauvegarde terminee ===" -ForegroundColor Yellow
+            Write-Host ("Copie totale (delta espace libre) : {0:N1} Go" -f $copied) -ForegroundColor Yellow
+            Write-Host ("Verification :  powershell -ExecutionPolicy Bypass -File {0}\backup.ps1 -Verify" -f $PSScriptRoot) -ForegroundColor Yellow
             break
         }
 
-        $prevTotal = $curTotal
-        $prevTime  = $now
+        Write-Host ""
+        $prevCopied = $copied
+        $prevTime   = $now
         Start-Sleep -Seconds $IntervalSec
     }
 }
