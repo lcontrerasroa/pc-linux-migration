@@ -11,19 +11,18 @@ SSD — mais on sécurise quand même (voir §4).
 
 Sauvegarde lancée vers `D:\BACKUP-PC-2026-09\` via `scripts/backup.ps1`.
 
-**✅ Copié à l'identique** (nombre de fichiers et octets = source, `rc=1`) :
-`_PRIORITAIRE-Adrien` (5 969 fichiers / 15,83 Go), `Downloads` (39 Go),
-`Documents` (2,46 Go), `Desktop` (22,89 Go, inclut Adrien),
-`Vieux-telechargements` (36,69 Go), `iCloudDrive`, `Firefox-profil`, `Opera-profil`,
-`Zotero`.
+**✅ Vérifié identique** (`backup.ps1 -Verify` : 0 fichier à recopier) :
+`_PRIORITAIRE-Adrien` (~15,83 Go), `Downloads` (39 Go), `Documents` (2,46 Go),
+`Desktop` (22,89 Go, inclut Adrien), `Vieux-telechargements` (36,69 Go),
+`iCloudDrive`, `Firefox-profil`, `Signal`, `Zotero`.
 
 **⚠️ Incomplet — à reprendre :**
 
-| Dossier | Manque | Cause | Correctif |
+| Dossier | Manque (passe `-Verify`) | Cause | Correctif |
 |---|---|---|---|
-| `Pictures` | **52 fichiers, ~3,06 Go** (`.MOV`/`.HEIC`/`.PNG` dans `iCloud Photos\Photos`) | Fichiers **« en ligne uniquement »** dans iCloud (coquilles vides) — `ERREUR 388/395 : accès au fichier cloud refusé`. Liste : `D:\BACKUP-PC-2026-09\_logs\Pictures_ECHECS_a_recuperer.txt` | Forcer le **téléchargement des originaux** (iCloud pour Windows → Photos, ou clic droit → « Toujours conserver sur cet appareil » ; ou icloud.com → tout télécharger), **puis relancer** `backup.ps1` (incrémental : ne copie que ces 52). |
-| `Chrome-profil` | 159 fichiers, ~20 Mo | Chrome ouvert → fichiers verrouillés (bases leveldb, Cookies) | Négligeable : favoris/mots de passe/extensions sont dans la **synchro du compte Google**. Sinon fermer Chrome et relancer. |
-| `Signal` | 6 fichiers | Signal ouvert → base verrouillée | Négligeable : **relier depuis le téléphone** après installation. |
+| `Pictures` | **~81 fichiers, ~3,5 Go** (`.MOV`/`.HEIC`/`.PNG` dans `iCloud Photos\Photos`) | Fichiers **« en ligne uniquement »** dans iCloud (coquilles vides) — `ERREUR 388/395 : accès au fichier cloud refusé`. Le nombre monte à mesure qu'iCloud « déshydrate » des fichiers. | Forcer le **téléchargement des originaux** (iCloud pour Windows → Photos, ou clic droit → « Toujours conserver sur cet appareil » ; ou icloud.com → tout télécharger), **puis relancer** `backup.ps1` (incrémental). Re-vérifier : `Pictures` doit passer à `Copies 0`. |
+| `Chrome-profil` | ~144 fichiers, ~60 Mo | Chrome ouvert → fichiers verrouillés (leveldb, Cookies) | Négligeable : favoris/mots de passe/extensions = **synchro du compte Google**. Sinon fermer Chrome et relancer. |
+| `Opera-profil` | 3 fichiers | Opera ouvert | Négligeable. |
 
 > ⛔ **Ne pas déconnecter le compte iCloud** tant que les 52 photos ne sont pas
 > descendues en local **et** re-sauvegardées. Vérifier aussi leur présence sur
