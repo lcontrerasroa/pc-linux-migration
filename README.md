@@ -23,6 +23,7 @@ adaptée au matériel.
 | [`04-choix-distribution-linux.md`](04-choix-distribution-linux.md) | Comparatif des distributions pour ce matériel précis + recommandation |
 | [`05-checklist-execution.md`](05-checklist-execution.md) | Checklist chronologique : avant / pendant / après l'installation |
 | [`scripts/backup.ps1`](scripts/backup.ps1) | Script PowerShell `robocopy` de sauvegarde (non destructif) |
+| [`scripts/watch-backup.ps1`](scripts/watch-backup.ps1) | Barre de progression à lancer dans sa propre fenêtre PowerShell (lecture seule) |
 | [`scripts/inventaire-post-install.md`](scripts/inventaire-post-install.md) | Commandes de vérification à lancer sous Linux après installation |
 
 ## État d'avancement
@@ -40,27 +41,18 @@ adaptée au matériel.
 
 ## Synchronisation avec Claude Code web
 
-Dépôt Git **local uniquement** pour l'instant (aucun remote configuré — l'ancien lien
-vers `backup-pc` a été retiré).
+✅ **Publié** : `https://github.com/lcontrerasroa/pc-linux-migration.git`
+(privé ; `main` suit `origin/main`, à jour au dernier commit).
 
-**Pourquoi la connexion GitHub échoue** : depuis août 2021, GitHub **n'accepte plus le
-mot de passe du compte** pour les opérations Git. Il faut soit un *jeton d'accès
-personnel* (PAT), soit la connexion par navigateur (OAuth) — c'est ce que fait GitHub
-Desktop.
+Le dépôt apparaît sur [claude.ai/code](https://claude.ai/code) — on peut y lancer une
+session cloud.
 
-**Marche à suivre :**
+- **Ce terminal n'a pas les identifiants GitHub** : les commits que je fais en local
+  restent locaux tant que **tu ne cliques pas `Push origin`** dans GitHub Desktop.
+- Dans l'autre sens, après une session cloud : `Pull origin` dans GitHub Desktop pour
+  récupérer les changements sur le PC.
+- Reste à faire : supprimer l'ancien dépôt vide **`backup-pc`** sur github.com
+  (`Settings` → bas de page → `Delete this repository`).
 
-1. **GitHub Desktop** → `File` → `Options` → `Accounts` → `Sign out`, puis `Sign in` →
-   **« Sign in using your browser »** → autoriser dans le navigateur (déjà connecté à
-   github.com). Plus de mot de passe à taper dans Git.
-2. `File` → `Add local repository…` → `C:\Users\cyber\github\pc-linux-migration`
-3. Bouton **`Publish repository`** → nom **`pc-linux-migration`** → **cocher « Keep this
-   code private »** → publier. GitHub Desktop crée le dépôt sur GitHub tout seul.
-4. Supprimer l'ancien dépôt vide **`backup-pc`** sur github.com
-   (`Settings` → tout en bas → `Delete this repository`).
-5. Le dépôt `pc-linux-migration` apparaît alors sur
-   [claude.ai/code](https://claude.ai/code) ; PC ↔ web se synchronisent ensuite par
-   `Push origin` / `Pull origin`.
-
-> Je n'ai pas pu créer le dépôt GitHub à ta place : ce terminal n'a ni la CLI `gh` ni
-> tes identifiants GitHub. La création passe forcément par GitHub Desktop (ou le site).
+> Rappel : depuis 2021 GitHub refuse le mot de passe du compte pour Git — il faut la
+> connexion navigateur (OAuth) de GitHub Desktop, ou un jeton d'accès personnel (PAT).
