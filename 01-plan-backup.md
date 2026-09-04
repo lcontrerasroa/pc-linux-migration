@@ -11,11 +11,13 @@ SSD — mais on sécurise quand même (voir §4).
 
 | Source | Taille | Nb fichiers | Note |
 |---|---:|---:|---|
+| 🔴 `C:\Users\cyber\Desktop\Adrien` | ~15,8 Go | 5 969 | **PRIORITÉ ABSOLUE.** Déjà inclus dans `Desktop`, mais copié **aussi** dans un dossier isolé `_PRIORITAIRE-Adrien\` et vérifié à part. |
 | `C:\Users\cyber\Downloads` | ~39 Go | 1 300 | Téléchargements principaux |
 | `C:\Users\cyber\Documents` | ~2,5 Go | 39 569 | **Synchronisé Google Drive** — voir §3 |
-| `C:\Users\cyber\Pictures` | ~9,5 Go | 1 796 | Images |
-| `C:\Users\cyber\Desktop` | ~22,8 Go | 44 993 | Bureau (beaucoup de petits fichiers → copie longue) |
-| **Sous-total dossiers principaux** | **~74 Go** | | |
+| `C:\Users\cyber\Pictures` | ~9,5 Go | 1 796 | Images — c'est en fait presque entièrement la **photothèque iCloud** (`iCloud Photos`). La sauvegarde la fige en local avant de déconnecter iCloud. |
+| `C:\Users\cyber\Desktop` | ~22,8 Go | 44 993 | Bureau (beaucoup de petits fichiers → copie longue). Contient `Adrien\`. |
+| `C:\Users\cyber\iCloudDrive` | ~0,07 Go | 36 | Pas de client iCloud sous Linux → copie locale indispensable. |
+| **Sous-total (Adrien compté une seule fois)** | **~74 Go** | | |
 
 ### « Téléchargements sur les deux partitions »
 
@@ -137,22 +139,46 @@ sauvegarde → **puis seulement** déconnecter les comptes → formater.
 8. Exporter mots de passe navigateurs + activer les synchros de navigateur.
 9. **Créer la clé USB Linux** (voir `04-choix-distribution-linux.md`) — sur une 2e clé,
    pas sur le disque de sauvegarde.
-10. **Débrancher le disque externe `D:`** et le ranger.
-11. **Ouvrir la tour et débrancher le disque Toshiba** (`E:`) — câbles SATA + alimentation.
-    (Optionnel mais c'est la garantie absolue de ne pas l'effacer.)
-12. Il ne reste que le SSD NVMe → lancer l'installation Linux.
-13. Après installation et premier démarrage OK : rebrancher le Toshiba, puis le disque
-    externe, vérifier que tout est lisible, **puis** commencer la restauration.
+10. **Débrancher le disque externe `D:`** (juste le câble USB — rien à ouvrir) et le ranger.
+    Ainsi seuls les 2 disques internes restent visibles pendant l'installation.
+11. **Le disque Toshiba `E:` reste branché** (pas besoin d'ouvrir la tour). La sécurité se
+    fait alors **dans l'installateur Fedora** — voir §6 ci-dessous.
+12. Lancer l'installation Linux en sélectionnant **uniquement le SSD NVMe** comme cible.
+13. Après installation et premier démarrage OK : rebrancher le disque externe,
+    vérifier que `E:` et la sauvegarde sont lisibles, **puis** commencer la restauration.
+
+## 6. Ne pas pouvoir débrancher `E:` — comment rester en sécurité
+
+Pas besoin d'ouvrir la tour. L'installateur de **Fedora (« Anaconda »)** liste tous les
+disques et **ne touche qu'à ceux que vous cochez**.
+
+1. Débrancher le **disque externe USB `D:`** (simple câble) → il ne reste que 2 disques.
+2. Dans l'écran **« Destination de l'installation »**, deux pastilles de disque apparaissent :
+   - **`WDC PC SN520` — ~238 Gio** → **la cocher** (c'est la cible Linux)
+   - **`TOSHIBA DT01ACA100` — ~931 Gio, étiquette `DATA`** → **la laisser décochée**
+   La taille (238 vs 931 Gio) et l'étiquette rendent la confusion quasi impossible.
+3. Choisir le partitionnement **« Automatique »** : Anaconda ne partitionnera **que** le
+   SN520 coché. (Ou « Personnalisé » et créer les partitions uniquement sur `nvme0n1`.)
+4. À l'écran de résumé avant écriture, **vérifier** que la ligne « sera formaté / effacé »
+   ne mentionne que `nvme0n1` (le SN520) et **jamais** `sda` (le Toshiba).
+5. Ne pas cocher l'option éventuelle « utiliser tout l'espace disponible sur tous les
+   disques » — rester sur le seul disque sélectionné.
+
+> C'est la méthode standard pour installer sur une machine multi-disques. Des millions
+> de gens le font sans jamais débrancher quoi que ce soit. Le débranchement physique
+> n'est qu'un « niveau de paranoïa » supplémentaire, pas une nécessité.
 
 ## 5. Estimation de volume
 
 ```
-Downloads (C:)            ~39,0 Go
+_PRIORITAIRE-Adrien (C:)   ~15,8 Go   (copie dédiée ; ces fichiers sont AUSSI dans Desktop)
+Downloads (C:)             ~39,0 Go
+Documents (C:)              ~2,5 Go
+Pictures (C:)               ~9,5 Go
+Desktop (C:)               ~22,8 Go   (inclut Adrien)
+iCloudDrive (C:)            ~0,1 Go
 Vieux téléchargements (E:) ~36,7 Go
-Documents (C:)             ~2,5 Go
-Pictures (C:)              ~9,5 Go
-Desktop (C:)              ~22,8 Go
-Profils / Signal / divers  ~1–2 Go
---------------------------------
-TOTAL                    ~110–115 Go     (D: dispose de 291 Go libres → OK)
+Profils / Signal / divers   ~1–2 Go
+---------------------------------
+TOTAL écrit sur D:        ~127–132 Go     (D: dispose de 291,9 Go libres → OK)
 ```

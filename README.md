@@ -5,10 +5,12 @@ inventaire des logiciels et de leurs équivalents Linux, choix de la distributio
 adaptée au matériel.
 
 - **Machine** : ASUS ROG Strix GL10DH_GL10DH (tour de bureau)
-- **Objectif** : effacement complet du SSD NVMe (actuellement Windows 11) et installation de Linux
-- **Données à préserver** : Téléchargements (2 emplacements), Documents, Images, Bureau
+- **Objectif** : effacement complet du SSD NVMe (actuellement Windows 11) → **Fedora KDE 42**
+- **Données à préserver** : Téléchargements (2 emplacements), Documents, Images, Bureau,
+  **`Desktop\Adrien` (priorité absolue)**, `iCloudDrive`
 - **Ne pas conserver** : jeux Steam, logiciels Windows non compatibles Linux
-- **Cible de sauvegarde** : disque externe USB WD My Passport (lettre `D:`, 291 Go libres)
+- **Cible de sauvegarde** : disque externe USB WD My Passport (`D:`, 291,9 Go libres)
+- **Disque `E:` (Toshiba 1 To)** : reste en place, protégé en ne le cochant pas dans l'installateur
 - **Date de préparation** : 2026-09-04
 
 ## Documents du projet
@@ -38,22 +40,27 @@ adaptée au matériel.
 
 ## Synchronisation avec Claude Code web
 
-Ce dossier est un dépôt Git relié à **`https://github.com/lcontrerasroa/backup-pc.git`**
-(remote `origin`, branche `main`).
+Dépôt Git **local uniquement** pour l'instant (aucun remote configuré — l'ancien lien
+vers `backup-pc` a été retiré).
 
-Premier envoi — via **GitHub Desktop** (il a les identifiants GitHub ; ce terminal ne
-les a pas) :
+**Pourquoi la connexion GitHub échoue** : depuis août 2021, GitHub **n'accepte plus le
+mot de passe du compte** pour les opérations Git. Il faut soit un *jeton d'accès
+personnel* (PAT), soit la connexion par navigateur (OAuth) — c'est ce que fait GitHub
+Desktop.
 
-1. `File` → `Add local repository…` → `C:\Users\cyber\github\pc-linux-migration`
-2. Bouton **`Push origin`** (ou `Publish branch`).
-3. Si GitHub Desktop signale un conflit d'historique (parce que le dépôt `backup-pc`
-   a été créé avec un README sur GitHub) : le dépôt est neuf et ne contient rien
-   d'important, donc soit
-   - `git pull origin main --allow-unrelated-histories` puis `git push`, soit
-   - `git push -u origin main --force` (écrase le README auto-généré).
+**Marche à suivre :**
 
-Ensuite : le dépôt apparaît sur [claude.ai/code](https://claude.ai/code), on peut y
-lancer une session cloud. PC ↔ web restent synchronisés par `Push origin` / `Pull origin`.
+1. **GitHub Desktop** → `File` → `Options` → `Accounts` → `Sign out`, puis `Sign in` →
+   **« Sign in using your browser »** → autoriser dans le navigateur (déjà connecté à
+   github.com). Plus de mot de passe à taper dans Git.
+2. `File` → `Add local repository…` → `C:\Users\cyber\github\pc-linux-migration`
+3. Bouton **`Publish repository`** → nom **`pc-linux-migration`** → **cocher « Keep this
+   code private »** → publier. GitHub Desktop crée le dépôt sur GitHub tout seul.
+4. Supprimer l'ancien dépôt vide **`backup-pc`** sur github.com
+   (`Settings` → tout en bas → `Delete this repository`).
+5. Le dépôt `pc-linux-migration` apparaît alors sur
+   [claude.ai/code](https://claude.ai/code) ; PC ↔ web se synchronisent ensuite par
+   `Push origin` / `Pull origin`.
 
-> Le nom du dépôt est `backup-pc` mais le projet couvre toute la migration ; on peut
-> le renommer sur GitHub (`Settings → Repository name`) sans casser le lien si besoin.
+> Je n'ai pas pu créer le dépôt GitHub à ta place : ce terminal n'a ni la CLI `gh` ni
+> tes identifiants GitHub. La création passe forcément par GitHub Desktop (ou le site).

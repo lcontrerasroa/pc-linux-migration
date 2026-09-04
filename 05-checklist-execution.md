@@ -48,24 +48,27 @@
 
 ## Phase B — Juste avant l'installation
 
-- [ ] Sauvegarde vérifiée ✔
-- [ ] Comptes cloud déconnectés ✔
-- [ ] **Débrancher physiquement** le disque externe `D:` et le ranger
-- [ ] Éteindre, ouvrir la tour, **débrancher le disque Toshiba `E:`** (câble SATA + alim)
-      → il ne reste que le SSD NVMe = impossible de se tromper de disque
+- [ ] Sauvegarde vérifiée ✔ (dont `_PRIORITAIRE-Adrien\` ouvert et contrôlé)
+- [ ] Comptes cloud déconnectés ✔ (Google Drive perso, Nextcloud UPJV, iCloud)
+- [ ] **Débrancher le câble USB** du disque externe `D:` et le ranger (rien à ouvrir)
+- [ ] Le disque Toshiba `E:` **reste branché** — on le protège dans l'installateur (Phase C)
 - [ ] Brancher un **câble Ethernet** (le Wi-Fi Realtek peut ne pas marcher pendant le live)
-- [ ] Insérer la clé USB, démarrer dessus (F8 au logo ASUS)
+- [ ] Insérer la clé USB Fedora KDE 42, démarrer dessus (F8 au logo ASUS)
 
-## Phase C — Installation
+## Phase C — Installation (Fedora KDE 42 / installateur Anaconda)
 
-- [ ] Démarrer en mode **live** (« Try » avant « Install »)
-- [ ] Vérifier en live : affichage net, son OK, Ethernet OK, (Wi-Fi si possible)
-- [ ] Lancer l'installation
-- [ ] Choisir « Effacer le disque » (le SN520 est le seul présent) — sinon mode manuel
-      et sélectionner explicitement le SN520
-- [ ] Cocher l'installation des codecs / pilotes tiers si proposé
-- [ ] Créer l'utilisateur, activer le chiffrement du disque si souhaité (LUKS)
-- [ ] Redémarrer, retirer la clé USB
+- [ ] Démarrer en mode **live** (« Try Fedora ») avant d'installer
+- [ ] Vérifier en live : affichage net, son OK, Ethernet OK, (Wi-Fi si possible),
+      Plasma 6 + session Wayland
+- [ ] Lancer « Installer sur le disque dur »
+- [ ] **Destination de l'installation** :
+      - **cocher UNIQUEMENT `WDC PC SN520` (~238 Gio)**
+      - **laisser `TOSHIBA DT01ACA100` (~931 Gio, `DATA`) décoché**
+- [ ] Partitionnement **Automatique** (Btrfs par défaut) — ou Personnalisé sur `nvme0n1` seul
+- [ ] Chiffrement du disque (LUKS) si souhaité — **bien noter la phrase de passe**
+- [ ] Écran de résumé : vérifier que **seul `nvme0n1` est marqué « formaté / effacé »**,
+      jamais `sda`
+- [ ] Lancer, créer l'utilisateur, redémarrer, retirer la clé USB
 
 ## Phase D — Post-installation (voir aussi `scripts/inventaire-post-install.md`)
 
@@ -77,9 +80,9 @@
       - Nobara / Pop!\_OS (ISO NVIDIA) : déjà présent, rien à faire
 - [ ] Secure Boot : au redémarrage, écran MOK → **Enroll MOK** → mot de passe choisi
 - [ ] Vérifier : `nvidia-smi` renvoie la carte et le pilote
-- [ ] Éteindre, **rebrancher le disque Toshiba `E:`**, redémarrer
-- [ ] Vérifier que `E:` est monté et lisible (NTFS lu/écrit via `ntfs3`)
-- [ ] Rebrancher le disque externe `D:`, vérifier la sauvegarde lisible
+- [ ] Vérifier que l'ancien `E:` (Toshiba, resté branché) est visible et lisible :
+      `lsblk -f` puis le monter (NTFS lu/écrit via `ntfs3`)
+- [ ] Rebrancher le disque externe `D:` (USB), vérifier la sauvegarde lisible
 
 ### D2. Wi-Fi (si instable)
 - [ ] Tester la stabilité du Wi-Fi RTL8822CE sur plusieurs heures

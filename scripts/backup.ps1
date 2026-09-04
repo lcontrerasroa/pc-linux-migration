@@ -32,12 +32,18 @@ param(
 $ErrorActionPreference = "Stop"
 $user = $env:USERPROFILE
 
-# --- Liste des sauvegardes : Nom, Source, Sélecteur de fichiers (vide = tout) ---
+# --- Liste des sauvegardes : Nom, Source, exclusions de dossiers (Xd) ---
+# L'ordre compte : les tâches PRIORITAIRES d'abord.
 $jobs = @(
+    # >>> PRIORITE ABSOLUE : copie dédiée du dossier Adrien (déjà inclus dans Desktop,
+    #     mais copié aussi ici, isolé et vérifié à part). Ne pas retirer.
+    @{ Name = "_PRIORITAIRE-Adrien";   Src = "$user\Desktop\Adrien" }
+
     @{ Name = "Downloads";              Src = "$user\Downloads" }
     @{ Name = "Documents";              Src = "$user\Documents" }
     @{ Name = "Pictures";               Src = "$user\Pictures" }
     @{ Name = "Desktop";                Src = "$user\Desktop" }
+    @{ Name = "iCloudDrive";            Src = "$user\iCloudDrive" }
     @{ Name = "Vieux-telechargements";  Src = "E:\Vieux téléchargements" }
 
     # Profils navigateurs / applis (secours ; l'idéal reste la synchro de compte)
@@ -78,16 +84,16 @@ foreach ($j in $jobs) {
     }
 
     $dst  = Join-Path $Destination $j.Name
-    $args = @($src, $dst, "/E", "/COPY:DAT", "/DCOPY:DAT", "/XJ", "/R:2", "/W:5", "/MT:16", "/NP", "/NDL")
+    $rcArgs = @($src, $dst, "/E", "/COPY:DAT", "/DCOPY:DAT", "/XJ", "/R:2", "/W:5", "/MT:16", "/NP", "/NDL")
 
-    if ($j.Xd)      { foreach ($d in $j.Xd) { $args += @("/XD", (Join-Path $src $d)) } }
-    if ($Verify)    { $args += "/L" }
+    if ($j.Xd)      { foreach ($d in $j.Xd) { $rcArgs += @("/XD", (Join-Path $src $d)) } }
+    if ($Verify)    { $rcArgs += "/L" }
     $log  = Join-Path $logDir ("{0}_{1}{2}.log" -f $j.Name, $stamp, ($(if($Verify){"_verify"}else{""})))
-    $args += "/LOG:$log"
-    $args += "/TEE"
+    $rcArgs += "/LOG:$log"
+    $rcArgs += "/TEE"
 
     Write-Host ("[ {0} ] {1}" -f $j.Name, $src) -ForegroundColor Green
-    robocopy @args | Out-Null
+    robocopy @rcArgs | Out-Null
     $rc = $LASTEXITCODE   # robocopy : <8 = OK
 
     $srcStat = Get-ChildItem -LiteralPath $src -Recurse -File -Force -ErrorAction SilentlyContinue |

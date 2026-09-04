@@ -13,7 +13,7 @@ Relevé le 2026-09-04 sur la machine (Windows 11 Famille, build 22631).
 | GPU dédié | **NVIDIA GeForce GTX 1660** (TU116, Turing) — `10DE:2184` | Bon, pilote propriétaire requis |
 | RAM | 16 Go (2× modules) | — |
 | SSD système | **WD PC SN520 SDAPNUW-256G** — NVMe M.2, 238 Go → *cible de l'installation Linux* | Excellent |
-| Disque de données | Toshiba DT01ACA100 — 1 To SATA — `E:` « DATA », 268 Go libres | Excellent (à débrancher pendant l'install) |
+| Disque de données | Toshiba DT01ACA100 — 1 To SATA — `E:` « DATA », 268 Go libres | Excellent — **reste branché** ; on le protège en ne le cochant pas dans l'installateur |
 | Disque externe | WD My Passport 07A8 — USB, 465 Go — `D:` « Cimade - CRA de Rennes », 291 Go libres | *cible de la sauvegarde* |
 | Wi-Fi | **Realtek RTL8822CE** 802.11ac + Bluetooth (combo M.2) — `10EC:C822` | ⚠️ Point sensible — voir ci-dessous |
 | Ethernet | Realtek RTL8111/8168 Gigabit — `10EC:8168` | OK d'origine (`r8169`) |
@@ -93,15 +93,20 @@ Fonctionne d'office. Les distributions récentes utilisent **PipeWire**
 ## Disques — schéma actuel
 
 ```
-Disque 1  WD SN520 NVMe 238 Go   →  C: OS (Windows, 3,9 Go libres !) + EFI + Recovery   ← À EFFACER puis Linux
-Disque 0  Toshiba 1 To SATA      →  E: DATA (268 Go libres)                             ← NE PAS TOUCHER (débrancher)
-Disque 2  WD My Passport USB     →  D: « Cimade - CRA de Rennes » (291 Go libres)       ← CIBLE SAUVEGARDE, puis débrancher
+nvme0n1  WD SN520 NVMe   238 Gio  →  C: OS (Windows, 3,9 Go libres !) + EFI + Recovery  ← À EFFACER puis Linux
+sda      Toshiba 1 To SATA  931 Gio →  E: DATA (268 Go libres)                           ← RESTE BRANCHÉ, NE PAS COCHER dans l'installateur
+sdb      WD My Passport USB 465 Gio →  D: « Cimade - CRA de Rennes » (291 Go libres)     ← CIBLE SAUVEGARDE, débrancher (câble USB) pendant l'install
 ```
 
 > ⚠️ **Le SSD système n'a que 3,9 Go libres.** La sauvegarde ne peut pas se faire dessus.
 > Elle va sur le disque externe `D:`.
 
-> ✅ **Sécurité anti-erreur de partitionnement** : cette tour permet de débrancher
-> physiquement les câbles SATA/alimentation du disque Toshiba et de retirer le disque
-> externe USB **avant** de lancer l'installateur. Il ne reste alors que le SSD NVMe :
-> impossible de se tromper de disque. On rebranche tout après.
+> ✅ **Sécurité anti-erreur de partitionnement, sans ouvrir la tour** :
+> 1. Débrancher le câble USB du disque externe `D:` (rien à ouvrir).
+> 2. Dans l'installateur Fedora (« Destination de l'installation »), **cocher uniquement
+>    `WDC PC SN520` (~238 Gio)** et **laisser `TOSHIBA … DT01ACA100` (~931 Gio, `DATA`)
+>    décoché**. Anaconda ne partitionne que les disques cochés.
+> 3. Sur l'écran de résumé, vérifier que seul `nvme0n1` est marqué « formaté / effacé ».
+>
+> Le débranchement physique du Toshiba n'est qu'une paranoïa optionnelle, pas une
+> obligation. Détail complet dans `01-plan-backup.md` §6.
