@@ -1,0 +1,22 @@
+# Ce dépôt ne contient que de la documentation et des scripts.
+# Ne jamais committer de données personnelles ni de journaux de sauvegarde.
+
+*.log
+_logs/
+_dotfiles/
+BACKUP-PC-*/
+*.csv
+*.7z
+*.zip
+r-packages.csv
+envs*.yml
+passwords*
+mots-de-passe*
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*~

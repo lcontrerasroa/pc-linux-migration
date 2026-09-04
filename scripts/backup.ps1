@@ -1,4 +1,4 @@
-<#
+﻿<#
     backup.ps1 — Sauvegarde non destructive des données essentielles du SSD
     avant effacement et installation de Linux.
 
@@ -125,10 +125,10 @@ $summary | Format-Table -AutoSize
 
 $errs = $summary | Where-Object { $_.Etat -like "ERREUR*" }
 if ($errs) {
-    Write-Host "`n⚠️  Des tâches ont renvoyé une erreur — voir les journaux dans $logDir" -ForegroundColor Red
+    Write-Host "`n[!] Des taches ont renvoye une erreur - voir les journaux dans $logDir" -ForegroundColor Red
 } elseif ($Verify) {
-    Write-Host "`nVérification terminée. Ouvrez les *_verify.log : ils doivent lister très peu de fichiers 'New File'." -ForegroundColor Yellow
+    Write-Host "`nVerification terminee. Ouvrez les *_verify.log : ils doivent lister tres peu de fichiers 'New File'." -ForegroundColor Yellow
 } else {
-    Write-Host "`n✅ Sauvegarde terminée. Journaux : $logDir" -ForegroundColor Green
-    Write-Host "   Étape suivante : .\scripts\backup.ps1 -Verify" -ForegroundColor Green
+    Write-Host "`n[OK] Sauvegarde terminee. Journaux : $logDir" -ForegroundColor Green
+    Write-Host "     Etape suivante : lancer  .\scripts\backup.ps1 -Verify" -ForegroundColor Green
 }
