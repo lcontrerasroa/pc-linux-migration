@@ -3,11 +3,14 @@
 ## Phase A — Préparation (PC encore sous Windows)
 
 ### A1. Sauvegarde des données
-- [ ] Brancher le disque externe WD My Passport (`D:`), vérifier ~291 Go libres
-- [ ] Créer `D:\BACKUP-PC-2026-09\`
-- [ ] Lancer `scripts/backup.ps1` (voir en-tête du script pour l'usage)
-- [ ] Relancer avec `-Verify` — la liste des différences doit être quasi vide
+- [x] 1re passe `scripts/backup.ps1` faite le 2026-09-04 (voir `01-plan-backup.md` §0)
+- [ ] **Rebrancher `D:`** (débranché après la 1re passe)
+- [ ] **iCloud Photos** : forcer le téléchargement des 52 originaux manquants
+      (`_logs\Pictures_ECHECS_a_recuperer.txt`), attendre la fin, **relancer `backup.ps1`**
+- [ ] (optionnel) fermer Chrome + Signal, relancer `backup.ps1` pour les fichiers verrouillés
+- [ ] Relancer avec `-Verify` — colonne « Copies » ~0 partout
 - [ ] Ouvrir au hasard 5–10 fichiers dans `D:\BACKUP-PC-2026-09\` (photos, PDF, docx)
+- [ ] Vérifier `_PRIORITAIRE-Adrien\` en particulier (ouvrir quelques fichiers)
 - [ ] Ajouter à la main les dossiers « à vérifier un par un » de `01-plan-backup.md` §1
       que vous voulez garder (`C:\Users\cyber\data`, `Praat`, `Recorded Calls`, etc.)
 

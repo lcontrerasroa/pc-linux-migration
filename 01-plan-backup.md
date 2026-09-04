@@ -7,6 +7,31 @@ après lancer l'installation de Linux.
 Tout ce qui est sur `E:` (Toshiba) et `D:` (externe) **survit** si on n'efface que le
 SSD — mais on sécurise quand même (voir §4).
 
+## 0. État de la sauvegarde — exécutée le 2026-09-04
+
+Sauvegarde lancée vers `D:\BACKUP-PC-2026-09\` via `scripts/backup.ps1`.
+
+**✅ Copié à l'identique** (nombre de fichiers et octets = source, `rc=1`) :
+`_PRIORITAIRE-Adrien` (5 969 fichiers / 15,83 Go), `Downloads` (39 Go),
+`Documents` (2,46 Go), `Desktop` (22,89 Go, inclut Adrien),
+`Vieux-telechargements` (36,69 Go), `iCloudDrive`, `Firefox-profil`, `Opera-profil`,
+`Zotero`.
+
+**⚠️ Incomplet — à reprendre :**
+
+| Dossier | Manque | Cause | Correctif |
+|---|---|---|---|
+| `Pictures` | **52 fichiers, ~3,06 Go** (`.MOV`/`.HEIC`/`.PNG` dans `iCloud Photos\Photos`) | Fichiers **« en ligne uniquement »** dans iCloud (coquilles vides) — `ERREUR 388/395 : accès au fichier cloud refusé`. Liste : `D:\BACKUP-PC-2026-09\_logs\Pictures_ECHECS_a_recuperer.txt` | Forcer le **téléchargement des originaux** (iCloud pour Windows → Photos, ou clic droit → « Toujours conserver sur cet appareil » ; ou icloud.com → tout télécharger), **puis relancer** `backup.ps1` (incrémental : ne copie que ces 52). |
+| `Chrome-profil` | 159 fichiers, ~20 Mo | Chrome ouvert → fichiers verrouillés (bases leveldb, Cookies) | Négligeable : favoris/mots de passe/extensions sont dans la **synchro du compte Google**. Sinon fermer Chrome et relancer. |
+| `Signal` | 6 fichiers | Signal ouvert → base verrouillée | Négligeable : **relier depuis le téléphone** après installation. |
+
+> ⛔ **Ne pas déconnecter le compte iCloud** tant que les 52 photos ne sont pas
+> descendues en local **et** re-sauvegardées. Vérifier aussi leur présence sur
+> icloud.com avant toute déconnexion.
+
+> Le disque `D:` a été débranché après la première passe — le rebrancher pour la
+> reprise des 52 fichiers et pour la vérification `-Verify`.
+
 ## 1. Ce qui doit être sauvegardé (sur le SSD `C:`)
 
 | Source | Taille | Nb fichiers | Note |
