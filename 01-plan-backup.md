@@ -57,9 +57,23 @@ SSD — mais on sécurise quand même (voir §4).
 
 ## 3. Sécuriser les dossiers synchronisés dans le cloud (IMPORTANT)
 
-Trois moteurs de synchronisation sont installés : **Google Drive**, **Nextcloud**, **iCloud**.
+Trois moteurs de synchronisation sont installés et **doivent tous être déconnectés
+avant l'effacement** :
+
+1. **Google Drive** (compte perso — dossier `Documents` synchronisé)
+2. **Nextcloud — instance de l'UPJV** (Université de Picardie Jules Verne)
+3. **iCloud** (iCloud Drive + iCloud pour Windows / Outlook)
+
 La crainte est justifiée : si un client de synchro voit ses fichiers locaux disparaître,
-il peut propager la suppression vers le cloud. Procédure sûre :
+il peut propager la suppression vers le cloud.
+
+**Double sécurité appliquée :** (a) copie « morte » complète sur le disque externe `D:`
+via `scripts/backup.ps1`, **et** (b) déconnexion des trois comptes avant de formater.
+La copie sur `D:` est la vraie garantie ; la déconnexion évite toute propagation de
+suppression pendant qu'on manipule les partitions.
+
+Ordre recommandé : vérifier en ligne → lancer la sauvegarde `D:` → vérifier la
+sauvegarde → **puis seulement** déconnecter les comptes → formater.
 
 ### Google Drive (« Google Drive pour ordinateur », dossier `Documents` synchronisé)
 
@@ -80,12 +94,18 @@ il peut propager la suppression vers le cloud. Procédure sûre :
 > **Insync** (payant, interface graphique), **Celeste**, ou **GNOME Online Accounts**
 > si environnement GNOME.
 
-### Nextcloud (`E:\Nextcloud`, `D:\nextcloud-data`, client 3.4.0)
+### Nextcloud — instance UPJV (`E:\Nextcloud`, `D:\nextcloud-data`, client 3.4.0)
 
-1. Vérifier sur le serveur Nextcloud (interface web) que les fichiers sont à jour.
-2. Client Nextcloud → **Quitter** (pas juste fermer la fenêtre) ou **supprimer le compte**
-   du client avant l'effacement.
-3. Le client Nextcloud existe **nativement sous Linux** : réinstallation simple ensuite.
+1. Se connecter à l'interface web du Nextcloud de l'UPJV et **vérifier que tous les
+   fichiers y sont bien synchronisés** (pas de flèche « en cours », pas de conflit).
+2. Client Nextcloud (icône barre des tâches) → ouvrir → **Compte → Supprimer le compte**,
+   ou au minimum **Quitter** l'application (pas juste fermer la fenêtre).
+   Supprimer le compte du client est le plus sûr : plus aucun lien local ↔ serveur.
+3. Noter l'**URL du serveur UPJV** et l'identifiant pour reconfigurer plus tard.
+   Si l'UPJV utilise un mot de passe d'application dédié pour le client, en régénérer
+   un au besoin après réinstallation.
+4. Le client Nextcloud existe **nativement sous Linux** (paquet officiel / Flatpak) :
+   réinstallation et reconnexion simples ensuite.
 
 ### iCloud (`iCloudDrive`, iCloud Outlook)
 

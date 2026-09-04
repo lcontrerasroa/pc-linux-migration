@@ -38,12 +38,22 @@ adaptée au matériel.
 
 ## Synchronisation avec Claude Code web
 
-Ce dossier est un dépôt Git. Pour le rendre accessible depuis
-[claude.ai/code](https://claude.ai/code) :
+Ce dossier est un dépôt Git relié à **`https://github.com/lcontrerasroa/backup-pc.git`**
+(remote `origin`, branche `main`).
 
-1. Ouvrir **GitHub Desktop** → `File` → `Add local repository…`
-2. Sélectionner `C:\Users\cyber\github\pc-linux-migration`
-3. `Publish repository` → **laisser « Keep this code private » coché** → `Publish repository`
-4. Le dépôt apparaît ensuite dans Claude Code web ; on peut y lancer une session cloud.
-5. Les deux côtés (PC et web) restent synchronisés par `git push` / `git pull`
-   (ou les boutons *Push origin* / *Pull origin* de GitHub Desktop).
+Premier envoi — via **GitHub Desktop** (il a les identifiants GitHub ; ce terminal ne
+les a pas) :
+
+1. `File` → `Add local repository…` → `C:\Users\cyber\github\pc-linux-migration`
+2. Bouton **`Push origin`** (ou `Publish branch`).
+3. Si GitHub Desktop signale un conflit d'historique (parce que le dépôt `backup-pc`
+   a été créé avec un README sur GitHub) : le dépôt est neuf et ne contient rien
+   d'important, donc soit
+   - `git pull origin main --allow-unrelated-histories` puis `git push`, soit
+   - `git push -u origin main --force` (écrase le README auto-généré).
+
+Ensuite : le dépôt apparaît sur [claude.ai/code](https://claude.ai/code), on peut y
+lancer une session cloud. PC ↔ web restent synchronisés par `Push origin` / `Pull origin`.
+
+> Le nom du dépôt est `backup-pc` mais le projet couvre toute la migration ; on peut
+> le renommer sur GitHub (`Settings → Repository name`) sans casser le lien si besoin.

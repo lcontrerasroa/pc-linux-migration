@@ -34,7 +34,8 @@
 - [ ] Noter les licences / clés de logiciels que vous voulez réutiliser (Reaper, Bitwig, etc.)
 
 ### A5. Clé USB d'installation
-- [ ] Choisir la distro (`04-choix-distribution-linux.md` — défaut : Linux Mint 22.x Cinnamon)
+- [ ] Choisir la distro (`04-choix-distribution-linux.md` — recommandé : **Fedora KDE 42**,
+      ou **Kubuntu 24.04** pour le parcours le plus simple ; bureau **KDE Plasma 6**)
 - [ ] Télécharger l'ISO depuis le site officiel
 - [ ] Vérifier le SHA256 (`Get-FileHash -Algorithm SHA256 <iso>`)
 - [ ] Écrire sur une clé USB ≥ 8 Go avec balenaEtcher (⚠️ **pas** le disque de sauvegarde)
@@ -70,7 +71,10 @@
 
 ### D1. Système & pilotes
 - [ ] Mises à jour complètes (`sudo apt update && sudo apt full-upgrade` / `sudo dnf upgrade`)
-- [ ] Installer le **pilote NVIDIA** (Mint : Gestionnaire de pilotes → `nvidia-driver-5xx`)
+- [ ] Installer le **pilote NVIDIA** :
+      - Kubuntu : *Pilotes additionnels* → `nvidia-driver-5xx` (1 clic, MOK guidé)
+      - Fedora KDE : RPM Fusion + `akmod-nvidia` + signature MOK (voir `04-choix-distribution-linux.md`)
+      - Nobara / Pop!\_OS (ISO NVIDIA) : déjà présent, rien à faire
 - [ ] Secure Boot : au redémarrage, écran MOK → **Enroll MOK** → mot de passe choisi
 - [ ] Vérifier : `nvidia-smi` renvoie la carte et le pilote
 - [ ] Éteindre, **rebrancher le disque Toshiba `E:`**, redémarrer
@@ -79,8 +83,10 @@
 
 ### D2. Wi-Fi (si instable)
 - [ ] Tester la stabilité du Wi-Fi RTL8822CE sur plusieurs heures
-- [ ] Si coupures : `sudo apt install rtw88-dkms` + option `disable_aspm=1`
-      (`02-inventaire-materiel.md` §1)
+- [ ] Si coupures : pilote DKMS à jour + option `disable_aspm=1` (`02-inventaire-materiel.md` §1)
+      - Kubuntu : `sudo apt install rtw88-dkms`
+      - Fedora : `sudo dnf copr enable kwizart/rtl8822ce` puis `sudo dnf install rtl8822ce`
+        (ou compiler depuis `github.com/lwfinger/rtw88`)
 - [ ] Sinon envisager la carte **Intel AX210** (~15–20 €, remplacement 5 min)
 
 ### D3. Restauration des données
@@ -106,11 +112,14 @@
       se mettre dans le groupe `audio`, yabridge si plugins Windows
 - [ ] Multimédia : VLC/mpv, DaVinci Resolve, Flameshot, OBS
 - [ ] Utilitaires : `p7zip`/`unrar`, FSearch, gestionnaire d'archives
-- [ ] Imprimante HP : `sudo apt install hplip` → ajouter l'imprimante dans les Paramètres
+- [ ] Imprimante HP Deskjet 3050A : installer `hplip` (`sudo apt install hplip` /
+      `sudo dnf install hplip`) → ajouter l'imprimante dans les Paramètres (souvent
+      détectée automatiquement via CUPS)
 
 ### D6. Confort
-- [ ] Timeshift : configurer des snapshots automatiques (Mint : préinstallé)
-- [ ] Firewall : `sudo ufw enable` (Ubuntu/Mint)
+- [ ] Snapshots système : **Timeshift** (Kubuntu) ou **snapper** / outil Btrfs (Fedora,
+      souvent déjà configuré avec `/` en Btrfs)
+- [ ] Firewall : `sudo ufw enable` (Kubuntu) — Fedora a `firewalld` actif par défaut
 - [ ] Disposition clavier + saisie API (ibus-table) si besoin phonétique
 - [ ] KDE Connect / GSConnect pour le lien avec le téléphone
 
