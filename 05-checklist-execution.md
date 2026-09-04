@@ -1,0 +1,121 @@
+# Checklist chronologique
+
+## Phase A — Préparation (PC encore sous Windows)
+
+### A1. Sauvegarde des données
+- [ ] Brancher le disque externe WD My Passport (`D:`), vérifier ~291 Go libres
+- [ ] Créer `D:\BACKUP-PC-2026-09\`
+- [ ] Lancer `scripts/backup.ps1` (voir en-tête du script pour l'usage)
+- [ ] Relancer avec `-Verify` — la liste des différences doit être quasi vide
+- [ ] Ouvrir au hasard 5–10 fichiers dans `D:\BACKUP-PC-2026-09\` (photos, PDF, docx)
+- [ ] Ajouter à la main les dossiers « à vérifier un par un » de `01-plan-backup.md` §1
+      que vous voulez garder (`C:\Users\cyber\data`, `Praat`, `Recorded Calls`, etc.)
+
+### A2. Navigateurs
+- [ ] Firefox : se connecter au compte Mozilla, forcer une synchro
+- [ ] Chrome : idem compte Google
+- [ ] Exporter les mots de passe de chaque navigateur en CSV → ranger dans un `.7z` chiffré
+      sur `D:\BACKUP-PC-2026-09\`
+- [ ] Exporter les favoris en HTML (secours)
+- [ ] Noter la liste des extensions utiles
+
+### A3. Dossiers cloud (détail dans `01-plan-backup.md` §3)
+- [ ] Google Drive : vérifier sur drive.google.com que `Documents` est bien en ligne
+- [ ] Google Drive : appli → Préférences → **Déconnecter le compte**
+- [ ] Nextcloud : vérifier côté serveur web → **Quitter** le client / retirer le compte
+- [ ] iCloud : vérifier sur icloud.com → **se déconnecter** d'iCloud pour Windows
+- [ ] OneDrive : vérifier en ligne → dissocier le PC
+
+### A4. Exports « listes » (à mettre dans la sauvegarde)
+- [ ] `conda env list` puis `conda env export -n <env> > <env>.yml` pour chaque environnement
+- [ ] Sous R : `write.csv(as.data.frame(installed.packages()[,c("Package","Version")]), "r-packages.csv", row.names=FALSE)`
+- [ ] Copier `%USERPROFILE%\.gitconfig`, config VS Code / Sublime si personnalisée
+- [ ] Lister les polices installées manuellement (surtout API/linguistique)
+- [ ] Noter les licences / clés de logiciels que vous voulez réutiliser (Reaper, Bitwig, etc.)
+
+### A5. Clé USB d'installation
+- [ ] Choisir la distro (`04-choix-distribution-linux.md` — défaut : Linux Mint 22.x Cinnamon)
+- [ ] Télécharger l'ISO depuis le site officiel
+- [ ] Vérifier le SHA256 (`Get-FileHash -Algorithm SHA256 <iso>`)
+- [ ] Écrire sur une clé USB ≥ 8 Go avec balenaEtcher (⚠️ **pas** le disque de sauvegarde)
+
+### A6. Réglages BIOS
+- [ ] Windows : désactiver « Démarrage rapide » (options d'alimentation)
+- [ ] Redémarrer, entrer dans le BIOS (Suppr au logo ASUS)
+- [ ] Mode UEFI (pas CSM) · Fast Boot désactivé · Secure Boot peut rester activé
+- [ ] Noter le modèle exact du SSD affiché dans le BIOS (WD SN520) pour ne pas se tromper
+
+## Phase B — Juste avant l'installation
+
+- [ ] Sauvegarde vérifiée ✔
+- [ ] Comptes cloud déconnectés ✔
+- [ ] **Débrancher physiquement** le disque externe `D:` et le ranger
+- [ ] Éteindre, ouvrir la tour, **débrancher le disque Toshiba `E:`** (câble SATA + alim)
+      → il ne reste que le SSD NVMe = impossible de se tromper de disque
+- [ ] Brancher un **câble Ethernet** (le Wi-Fi Realtek peut ne pas marcher pendant le live)
+- [ ] Insérer la clé USB, démarrer dessus (F8 au logo ASUS)
+
+## Phase C — Installation
+
+- [ ] Démarrer en mode **live** (« Try » avant « Install »)
+- [ ] Vérifier en live : affichage net, son OK, Ethernet OK, (Wi-Fi si possible)
+- [ ] Lancer l'installation
+- [ ] Choisir « Effacer le disque » (le SN520 est le seul présent) — sinon mode manuel
+      et sélectionner explicitement le SN520
+- [ ] Cocher l'installation des codecs / pilotes tiers si proposé
+- [ ] Créer l'utilisateur, activer le chiffrement du disque si souhaité (LUKS)
+- [ ] Redémarrer, retirer la clé USB
+
+## Phase D — Post-installation (voir aussi `scripts/inventaire-post-install.md`)
+
+### D1. Système & pilotes
+- [ ] Mises à jour complètes (`sudo apt update && sudo apt full-upgrade` / `sudo dnf upgrade`)
+- [ ] Installer le **pilote NVIDIA** (Mint : Gestionnaire de pilotes → `nvidia-driver-5xx`)
+- [ ] Secure Boot : au redémarrage, écran MOK → **Enroll MOK** → mot de passe choisi
+- [ ] Vérifier : `nvidia-smi` renvoie la carte et le pilote
+- [ ] Éteindre, **rebrancher le disque Toshiba `E:`**, redémarrer
+- [ ] Vérifier que `E:` est monté et lisible (NTFS lu/écrit via `ntfs3`)
+- [ ] Rebrancher le disque externe `D:`, vérifier la sauvegarde lisible
+
+### D2. Wi-Fi (si instable)
+- [ ] Tester la stabilité du Wi-Fi RTL8822CE sur plusieurs heures
+- [ ] Si coupures : `sudo apt install rtw88-dkms` + option `disable_aspm=1`
+      (`02-inventaire-materiel.md` §1)
+- [ ] Sinon envisager la carte **Intel AX210** (~15–20 €, remplacement 5 min)
+
+### D3. Restauration des données
+- [ ] Copier depuis `D:\BACKUP-PC-2026-09\` vers `~/Téléchargements`, `~/Documents`,
+      `~/Images`, `~/Bureau`
+- [ ] Restaurer profils navigateurs (ou juste se reconnecter aux synchros)
+- [ ] Réinstaller Signal → lier depuis le téléphone
+- [ ] Zotero : installer, se connecter, laisser resynchroniser
+
+### D4. Cloud sous Linux
+- [ ] Nextcloud : installer le client officiel, reconnecter le compte
+- [ ] Google Drive : rclone (`rclone config`) ou Insync ; ou navigateur
+- [ ] OneDrive : `abraunegg/onedrive` ou rclone si besoin
+
+### D5. Applications (voir `03-logiciels-equivalents-linux.md`)
+- [ ] Bureautique : LibreOffice (souvent préinstallé) + ONLYOFFice si besoin `.docx` fidèle
+- [ ] Navigateurs : Firefox, Chrome, Opera
+- [ ] Comm : Discord, Zoom, Signal, (Teams web)
+- [ ] Recherche : Praat, ELAN, CLAN, Phon, SPPAS, Zotero, R + RStudio, Miniforge/conda,
+      pandoc, polices SIL
+- [ ] Restaurer les environnements : `conda env create -f <env>.yml`, réinstaller packages R
+- [ ] MAO : installer le DAW retenu (Reaper / Bitwig / Ardour), PipeWire-JACK,
+      se mettre dans le groupe `audio`, yabridge si plugins Windows
+- [ ] Multimédia : VLC/mpv, DaVinci Resolve, Flameshot, OBS
+- [ ] Utilitaires : `p7zip`/`unrar`, FSearch, gestionnaire d'archives
+- [ ] Imprimante HP : `sudo apt install hplip` → ajouter l'imprimante dans les Paramètres
+
+### D6. Confort
+- [ ] Timeshift : configurer des snapshots automatiques (Mint : préinstallé)
+- [ ] Firewall : `sudo ufw enable` (Ubuntu/Mint)
+- [ ] Disposition clavier + saisie API (ibus-table) si besoin phonétique
+- [ ] KDE Connect / GSConnect pour le lien avec le téléphone
+
+## Phase E — Nettoyage (après quelques semaines, une fois sûr de tout)
+
+- [ ] Vérifier qu'il ne manque rien dans les données restaurées
+- [ ] Ne **pas** effacer `D:\BACKUP-PC-2026-09\` avant au moins 1–2 mois d'usage Linux
+- [ ] Reformater / réutiliser l'espace du Toshiba `E:` selon besoin
