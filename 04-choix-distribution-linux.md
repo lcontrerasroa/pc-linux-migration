@@ -45,7 +45,7 @@ Ce que KDE vous donnera concrètement :
 
 | Distro (édition KDE) | Noyau (2026) | Pilote NVIDIA | Wi-Fi 8822CE d'origine | Secure Boot | Maintenance | Verdict |
 |---|---|---|---|---|---|---|
-| **Fedora KDE 42** | **6.13+** (très frais) | RPM Fusion + `akmod-nvidia` + signature MOK (procédure officielle, ~5 cmd) | **Très bon** (noyau récent) | Oui | Modérée, MàJ fréquentes mais stables | ✅ **Recommandé** |
+| **Fedora KDE 44** | **6.19** (très frais) | RPM Fusion + `akmod-nvidia` + signature MOK (procédure officielle, ~5 cmd) | **Très bon** (noyau récent) | Oui | Modérée, MàJ fréquentes mais stables | ✅ **Recommandé** |
 | **Kubuntu 24.04 LTS** | 6.8 → HWE 6.11+ | « Pilotes additionnels » **en 1 clic**, MOK guidé | Correct (6.8), bon après HWE | Oui | Faible (LTS 5 ans) | ✅ **Recommandé** (option tranquille) |
 | **Nobara (KDE)** — base Fedora | 6.13+ | **Préinstallé et signé**, + codecs | Très bon | Oui | Modérée, petite équipe (GloriousEggroll) | ✅ Bon si vous voulez « rien configurer » |
 | **Pop!\_OS** (ISO NVIDIA, bureau COSMIC) | 6.12+ | **Préinstallé** (ISO NVIDIA) | Correct | Oui | Faible | ✅ Si COSMIC 24.04 est stable à la date d'install |
@@ -56,7 +56,7 @@ Ce que KDE vous donnera concrètement :
 
 ## Recommandation
 
-### 1er choix — **Fedora KDE 42**
+### 1er choix — **Fedora KDE 44**
 
 Le meilleur alignement avec vos priorités (**beau + personnalisable**) *et* ce matériel :
 

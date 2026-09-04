@@ -5,7 +5,7 @@ inventaire des logiciels et de leurs équivalents Linux, choix de la distributio
 adaptée au matériel.
 
 - **Machine** : ASUS ROG Strix GL10DH_GL10DH (tour de bureau)
-- **Objectif** : effacement complet du SSD NVMe (actuellement Windows 11) → **Fedora KDE 42**
+- **Objectif** : effacement complet du SSD NVMe (actuellement Windows 11) → **Fedora KDE 44**
 - **Données à préserver** : Téléchargements (2 emplacements), Documents, Images, Bureau,
   **`Desktop\Adrien` (priorité absolue)**, `iCloudDrive`
 - **Ne pas conserver** : jeux Steam, logiciels Windows non compatibles Linux
@@ -32,27 +32,24 @@ adaptée au matériel.
 - [x] Inventaire logiciel
 - [x] Mesure des volumes à sauvegarder
 - [x] Choix de la distribution
-- [ ] Sauvegarde effectuée et vérifiée
-- [ ] Dossiers cloud sécurisés (comptes déconnectés, copies vérifiées en ligne)
-- [ ] Clé USB d'installation créée
+- [x] Sauvegarde effectuée et vérifiée
+- [x] Dossiers cloud sécurisés (comptes déconnectés, copies vérifiées en ligne)
+- [x] Clé USB d'installation créée (Fedora KDE 44, vérifiée par empreinte SHA-256)
 - [ ] Installation Linux
 - [ ] Restauration des données
 - [ ] Réinstallation des logiciels
 
-## Synchronisation avec Claude Code web
+## Synchronisation
 
-✅ **Publié** : `https://github.com/lcontrerasroa/pc-linux-migration.git`
-(privé ; `main` suit `origin/main`, à jour au dernier commit).
+✅ **Publié** : `https://github.com/lcontrerasroa/pc-linux-migration.git` (privé).
 
 Le dépôt apparaît sur [claude.ai/code](https://claude.ai/code) — on peut y lancer une
 session cloud.
 
-- **Ce terminal n'a pas les identifiants GitHub** : les commits que je fais en local
-  restent locaux tant que **tu ne cliques pas `Push origin`** dans GitHub Desktop.
-- Dans l'autre sens, après une session cloud : `Pull origin` dans GitHub Desktop pour
-  récupérer les changements sur le PC.
+**Depuis le 2026-09-04, le clone de référence est sur le portable HP ZBook**, dans
+`~/Documents/pc-linux-migration`, et `gh` y est authentifié : les commits partent
+directement avec `git push`. C'est ce clone qui compte désormais, puisque le PC Windows
+(ASUS ROG) est effacé et que son clone GitHub Desktop disparaît avec lui.
+
 - Reste à faire : supprimer l'ancien dépôt vide **`backup-pc`** sur github.com
   (`Settings` → bas de page → `Delete this repository`).
-
-> Rappel : depuis 2021 GitHub refuse le mot de passe du compte pour Git — il faut la
-> connexion navigateur (OAuth) de GitHub Desktop, ou un jeton d'accès personnel (PAT).

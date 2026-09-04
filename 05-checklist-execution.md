@@ -4,14 +4,14 @@
 
 ### A1. Sauvegarde des données
 - [x] 1re passe `scripts/backup.ps1` faite le 2026-09-04 (voir `01-plan-backup.md` §0)
-- [ ] **Rebrancher `D:`** (débranché après la 1re passe)
-- [ ] **iCloud Photos** : forcer le téléchargement des 52 originaux manquants
+- [x] **Rebrancher `D:`** (débranché après la 1re passe)
+- [x] **iCloud Photos** : forcer le téléchargement des 52 originaux manquants
       (`_logs\Pictures_ECHECS_a_recuperer.txt`), attendre la fin, **relancer `backup.ps1`**
-- [ ] (optionnel) fermer Chrome + Signal, relancer `backup.ps1` pour les fichiers verrouillés
-- [ ] Relancer avec `-Verify` — colonne « Copies » ~0 partout
-- [ ] Ouvrir au hasard 5–10 fichiers dans `D:\BACKUP-PC-2026-09\` (photos, PDF, docx)
-- [ ] Vérifier `_PRIORITAIRE-Adrien\` en particulier (ouvrir quelques fichiers)
-- [ ] Ajouter à la main les dossiers « à vérifier un par un » de `01-plan-backup.md` §1
+- [x] (optionnel) fermer Chrome + Signal, relancer `backup.ps1` pour les fichiers verrouillés
+- [x] Relancer avec `-Verify` — colonne « Copies » ~0 partout
+- [x] Ouvrir au hasard 5–10 fichiers dans `D:\BACKUP-PC-2026-09\` (photos, PDF, docx)
+- [x] Vérifier `_PRIORITAIRE-Adrien\` en particulier (ouvrir quelques fichiers)
+- [x] Ajouter à la main les dossiers « à vérifier un par un » de `01-plan-backup.md` §1
       que vous voulez garder (`C:\Users\cyber\data`, `Praat`, `Recorded Calls`, etc.)
 
 ### A2. Navigateurs
@@ -23,11 +23,11 @@
 - [ ] Noter la liste des extensions utiles
 
 ### A3. Dossiers cloud (détail dans `01-plan-backup.md` §3)
-- [ ] Google Drive : vérifier sur drive.google.com que `Documents` est bien en ligne
-- [ ] Google Drive : appli → Préférences → **Déconnecter le compte**
-- [ ] Nextcloud : vérifier côté serveur web → **Quitter** le client / retirer le compte
-- [ ] iCloud : vérifier sur icloud.com → **se déconnecter** d'iCloud pour Windows
-- [ ] OneDrive : vérifier en ligne → dissocier le PC
+- [x] Google Drive : vérifier sur drive.google.com que `Documents` est bien en ligne
+- [x] Google Drive : appli → Préférences → **Déconnecter le compte**
+- [x] Nextcloud : vérifier côté serveur web → **Quitter** le client / retirer le compte
+- [x] iCloud : vérifier sur icloud.com → **se déconnecter** d'iCloud pour Windows
+- [x] OneDrive : vérifier en ligne → dissocier le PC
 
 ### A4. Exports « listes » (à mettre dans la sauvegarde)
 - [ ] `conda env list` puis `conda env export -n <env> > <env>.yml` pour chaque environnement
@@ -37,16 +37,37 @@
 - [ ] Noter les licences / clés de logiciels que vous voulez réutiliser (Reaper, Bitwig, etc.)
 
 ### A5. Clé USB d'installation
-- [ ] Choisir la distro (`04-choix-distribution-linux.md` — recommandé : **Fedora KDE 42**,
-      ou **Kubuntu 24.04** pour le parcours le plus simple ; bureau **KDE Plasma 6**)
-- [ ] Télécharger l'ISO depuis le site officiel
-- [ ] Vérifier le SHA256 (`Get-FileHash -Algorithm SHA256 <iso>`)
-- [ ] Écrire sur une clé USB ≥ 8 Go avec balenaEtcher (⚠️ **pas** le disque de sauvegarde)
+- [x] Distro retenue : **Fedora KDE 44** (`04-choix-distribution-linux.md`), Plasma 6, noyau 6.19
+- [x] ISO téléchargée : `Fedora-KDE-Desktop-Live-44-1.7.x86_64.iso` (3,2 Go)
+- [x] SHA-256 vérifié contre le CHECKSUM officiel Fedora (2 miroirs) :
+      `c8295961d4c41adbf785a31a17c21a971d3b7415fda72dcad0c11c49577bf03a`
+- [x] Écriture sur la clé depuis Linux (ISO hybride, `dd` suffit — ni Etcher ni Ventoy) :
+      ```bash
+      sudo dd if=Fedora-KDE-Desktop-Live-44-1.7.x86_64.iso of=/dev/sdX \
+              bs=4M status=progress oflag=direct conv=fsync
+      ```
+      ⚠️ `/dev/sdX` = la clé **entière**, sans chiffre. Vérifier avec `lsblk -d -o NAME,SIZE,TRAN,MODEL`.
+- [x] Vérification par empreinte, et **pas** avec `cmp` : le code de retour de `cmp` remonté
+      à travers un wrapper s'est révélé faux dans les deux sens. La bonne méthode :
+      ```bash
+      echo 3 | sudo tee /proc/sys/vm/drop_caches
+      sudo head -c 3368683520 /dev/sdX | sha256sum   # doit rendre le SHA-256 de l'ISO
+      ```
+- [x] Résultat : empreinte identique ✔ (clé lente, ~6,5 Mo/s en écriture et 16 Mo/s en
+      lecture — le live mettra plusieurs minutes à démarrer, c'est normal)
 
-### A6. Réglages BIOS
-- [ ] Windows : désactiver « Démarrage rapide » (options d'alimentation)
-- [ ] Redémarrer, entrer dans le BIOS (Suppr au logo ASUS)
-- [ ] Mode UEFI (pas CSM) · Fast Boot désactivé · Secure Boot peut rester activé
+### A6. Réglages BIOS et Windows
+- [x] **BitLocker** : vérifié sur `E:` → `manage-bde -status E:` renvoie **0,0 % chiffré**.
+      Rien à déchiffrer, le Toshiba sera lisible sous Linux.
+- [x] **Démarrage rapide Windows désactivé** (`powercfg /h off` en PowerShell admin).
+      Indispensable ici : il hiberne Windows au lieu de l'éteindre et laisse le *dirty bit*
+      sur les volumes NTFS montés. Un `E:` marqué sale est monté **en lecture seule** par
+      `ntfs3`, et Windows ne sera plus là pour le réparer. Puis **Arrêter**, pas Redémarrer.
+- [x] **Mode BIOS = UEFI** confirmé via `msinfo32` (attendu : Windows 11 impose UEFI + GPT).
+      Le CSM est donc déjà désactivé — ne rien changer dans le BIOS.
+- [ ] Secure Boot : **laisser activé**, Fedora 44 est signé (le MOK n'arrive qu'au pilote NVIDIA)
+- [ ] `Fast Boot` du BIOS (≠ démarrage rapide Windows) : n'y toucher que si **F8** ne donne
+      rien au logo ASUS → `Suppr` → `F7` mode avancé → onglet `Boot` → `Fast Boot: Disabled`
 - [ ] Noter le modèle exact du SSD affiché dans le BIOS (WD SN520) pour ne pas se tromper
 
 ## Phase B — Juste avant l'installation
@@ -56,9 +77,23 @@
 - [ ] **Débrancher le câble USB** du disque externe `D:` et le ranger (rien à ouvrir)
 - [ ] Le disque Toshiba `E:` **reste branché** — on le protège dans l'installateur (Phase C)
 - [ ] Brancher un **câble Ethernet** (le Wi-Fi Realtek peut ne pas marcher pendant le live)
-- [ ] Insérer la clé USB Fedora KDE 42, démarrer dessus (F8 au logo ASUS)
+- [ ] Insérer la clé USB Fedora KDE 44, démarrer dessus (**F8** au logo ASUS)
+- [ ] Au menu de démarrage, choisir l'entrée préfixée **`UEFI:`** — la clé y apparaît
+      souvent deux fois. Démarrer sur l'entrée non-UEFI installerait Fedora en mode BIOS
+      sur un disque GPT : échec ou système qui ne démarre pas.
 
-## Phase C — Installation (Fedora KDE 42 / installateur Anaconda)
+## Phase C — Installation (Fedora KDE 44 / installateur Anaconda)
+
+> ⚠️ **Ne jamais transposer les noms de disques d'une machine à l'autre.**
+> Sur le portable qui a servi à préparer la clé, `sda` était le SSD système.
+> **Sur le ROG Strix, `sda` est le Toshiba `E:` à préserver**, et la cible est `nvme0n1`.
+> Premier réflexe en live, avant de lancer l'installateur :
+> ```bash
+> lsblk -d -o NAME,SIZE,TRAN,MODEL
+> ```
+> Attendu : `nvme0n1` ≈ 238 Gio (WD SN520, **à effacer**) et `sda` ≈ 931 Gio
+> (TOSHIBA DT01ACA100, **à ne pas cocher**).
+
 
 - [ ] Démarrer en mode **live** (« Try Fedora ») avant d'installer
 - [ ] Vérifier en live : affichage net, son OK, Ethernet OK, (Wi-Fi si possible),
